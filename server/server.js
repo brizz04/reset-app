@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as zepp from './zepp.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT || 3000);
@@ -150,6 +151,21 @@ CREATE TABLE IF NOT EXISTS workouts (
   kcal REAL NOT NULL DEFAULT 0,
   source TEXT NOT NULL DEFAULT 'import',
   PRIMARY KEY (user_id, id)
+);
+`);
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS zepp_accounts (
+  user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  pass_enc TEXT NOT NULL,
+  country TEXT NOT NULL DEFAULT 'US',
+  app_token TEXT,
+  zepp_user TEXT,
+  created TEXT NOT NULL,
+  last_sync TEXT,
+  last_error TEXT,
+  synced_once INTEGER NOT NULL DEFAULT 0
 );
 `);
 
@@ -1042,7 +1058,7 @@ function parseIngest(body) {
     }
   }
   const DAILY = [['steps', 'steps'], ['exercise_minutes', 'exercise'], ['distance_km', 'distance'], ['calories', 'kcal'], ['resting_hr', 'resting'],
-    ['hr_avg', 'hr_avg'], ['hr_min', 'hr_min'], ['hr_max', 'hr_max'], ['hrv', 'hrv'], ['spo2', 'spo2'], ['sleep_hours', 'sleep'], ['vo2max', 'vo2max']];
+    ['hr_avg', 'hr_avg'], ['hr_min', 'hr_min'], ['hr_max', 'hr_max'], ['hrv', 'hrv'], ['spo2', 'spo2'], ['sleep_hours', 'sleep'], ['sleep_deep_hours', 'sleep_deep'], ['sleep_rem_hours', 'sleep_rem'], ['vo2max', 'vo2max']];
   for (const d of Array.isArray(data.daily) ? data.daily : []) {
     const date = tsInfo(d?.date)?.date;
     if (!date) continue;
@@ -1087,35 +1103,42 @@ function ingestAuth(req, res, next) {
 
 app.post('/api/health/ingest', ingestAuth, express.json({ limit: '3mb' }), (req, res) => {
   if ((req.headers['content-type'] || '').indexOf('application/json') !== 0) return res.status(415).json({ error: 'Content-Type debe ser application/json' });
-  const { metrics, workouts } = parseIngest(req.body);
-  if (metrics.length > 20000 || workouts.length > 2000) return res.status(413).json({ error: 'Demasiados datos en una sola petición' });
-  const today = localNow(req.user.tz).date;
+  const parsed = parseIngest(req.body);
+  if (parsed.metrics.length > 20000 || parsed.workouts.length > 2000) return res.status(413).json({ error: 'Demasiados datos en una sola petición' });
+  const r = saveHealth(req.user, parsed);
+  db.prepare('UPDATE health_tokens SET last_used = ? WHERE user_id = ?').run(new Date().toISOString(), req.user.id);
+  res.json({ ok: true, metrics: r.metrics, workouts: r.workouts, completed_habits: r.completed });
+});
+
+// Guarda métricas y entrenamientos ya interpretados (de la app puente o de Zepp) y completa los hábitos automáticos
+function saveHealth(user, { metrics, workouts }, source = 'import') {
+  const today = localNow(user.tz).date;
   const minDate = isoDate(Date.now() - 400 * 86400000);
   const maxDate = isoDate(Date.now() + 2 * 86400000);
   const inRange = (d) => d >= minDate && d <= maxDate;
   const upM = db.prepare('INSERT INTO health_metrics (user_id, metric, ts, date, qty) VALUES (?, ?, ?, ?, ?) ON CONFLICT (user_id, metric, ts) DO UPDATE SET qty = excluded.qty, date = excluded.date');
-  const upW = db.prepare("INSERT INTO workouts (user_id, id, date, type, start, minutes, distance_km, kcal, avg_hr, max_hr, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'import') ON CONFLICT (user_id, id) DO UPDATE SET date = excluded.date, type = excluded.type, start = excluded.start, minutes = excluded.minutes, distance_km = excluded.distance_km, kcal = excluded.kcal, avg_hr = excluded.avg_hr, max_hr = excluded.max_hr");
+  const upW = db.prepare(`INSERT INTO workouts (user_id, id, date, type, start, minutes, distance_km, kcal, avg_hr, max_hr, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '${source}') ON CONFLICT (user_id, id) DO UPDATE SET date = excluded.date, type = excluded.type, start = excluded.start, minutes = excluded.minutes, distance_km = excluded.distance_km, kcal = excluded.kcal, avg_hr = excluded.avg_hr, max_hr = excluded.max_hr`);
   const dates = new Set();
   let nm = 0;
   let nw = 0;
   db.exec('BEGIN');
   try {
-    for (const m of metrics) if (inRange(m.date)) { upM.run(req.user.id, m.metric, m.ts, m.date, m.qty); dates.add(m.date); nm++; }
-    for (const w of workouts) if (inRange(w.date)) { upW.run(req.user.id, w.id, w.date, w.type, w.start, w.minutes, w.km, w.kcal, w.avgHr, w.maxHr); dates.add(w.date); nw++; }
+    for (const m of metrics) if (inRange(m.date)) { upM.run(user.id, m.metric, m.ts, m.date, m.qty); dates.add(m.date); nm++; }
+    for (const w of workouts) if (inRange(w.date)) { upW.run(user.id, w.id, w.date, w.type, w.start, w.minutes, w.km, w.kcal, w.avgHr, w.maxHr); dates.add(w.date); nw++; }
     db.exec('COMMIT');
   } catch (e) { db.exec('ROLLBACK'); throw e; }
-  db.prepare('UPDATE health_tokens SET last_used = ? WHERE user_id = ?').run(new Date().toISOString(), req.user.id);
   const auto = [];
   for (const d of [...dates].sort().slice(-40)) {
     const recent = diffDays(today, d) <= 1 && diffDays(today, d) >= -1; // no avisar de datos antiguos al recuperar historial
-    for (const hb of evaluateAuto(req.user, d, recent)) auto.push(hb.title);
+    for (const hb of evaluateAuto(user, d, recent)) auto.push(hb.title);
   }
-  res.json({ ok: true, metrics: nm, workouts: nw, completed_habits: auto });
-});
+  return { metrics: nm, workouts: nw, completed: auto };
+}
 
 app.get('/api/health/status', auth, (req, res) => {
   const t = db.prepare('SELECT created, last_used FROM health_tokens WHERE user_id = ?').get(req.user.id);
-  res.json({ token: t || null });
+  const z = db.prepare('SELECT email, country, last_sync, last_error FROM zepp_accounts WHERE user_id = ?').get(req.user.id);
+  res.json({ token: t || null, zepp: z || null });
 });
 app.post('/api/health/token', auth, (req, res) => {
   const token = 'rst_' + crypto.randomBytes(24).toString('hex');
@@ -1125,6 +1148,91 @@ app.post('/api/health/token', auth, (req, res) => {
 });
 app.delete('/api/health/token', auth, (req, res) => {
   db.prepare('DELETE FROM health_tokens WHERE user_id = ?').run(req.user.id);
+  res.json({ ok: true });
+});
+
+// ---------- Zepp: lectura directa de la cuenta ----------
+// La contraseña se guarda cifrada (AES-256-GCM) con una clave aparte en DATA_DIR/zepp.key, para poder volver a
+// iniciar sesión cuando caduque el token. Quien tenga acceso a toda la carpeta de datos podría descifrarla.
+const zeppKeyFile = path.join(DATA_DIR, 'zepp.key');
+let zeppKey;
+try { zeppKey = Buffer.from(fs.readFileSync(zeppKeyFile, 'utf8').trim(), 'hex'); } catch { zeppKey = null; }
+if (!zeppKey || zeppKey.length !== 32) {
+  zeppKey = crypto.randomBytes(32);
+  fs.writeFileSync(zeppKeyFile, zeppKey.toString('hex'), { mode: 0o600 });
+}
+function sealSecret(text) {
+  const iv = crypto.randomBytes(12);
+  const c = crypto.createCipheriv('aes-256-gcm', zeppKey, iv);
+  const enc = Buffer.concat([c.update(text, 'utf8'), c.final()]);
+  return Buffer.concat([iv, c.getAuthTag(), enc]).toString('base64');
+}
+function openSecret(b64) {
+  const raw = Buffer.from(b64, 'base64');
+  const d = crypto.createDecipheriv('aes-256-gcm', zeppKey, raw.subarray(0, 12));
+  d.setAuthTag(raw.subarray(12, 28));
+  return Buffer.concat([d.update(raw.subarray(28)), d.final()]).toString('utf8');
+}
+
+const zeppBusy = new Set();
+async function zeppSync(userId) {
+  const row = db.prepare('SELECT * FROM zepp_accounts WHERE user_id = ?').get(userId);
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+  if (!row || !user || zeppBusy.has(userId)) return null;
+  zeppBusy.add(userId);
+  try {
+    const days = row.synced_once ? 3 : 14;
+    const today = localNow(user.tz).date;
+    const from = addDays(today, -(days - 1));
+    let session = row.app_token ? { appToken: row.app_token, userId: row.zepp_user } : null;
+    const pull = async () => ({ daily: await zepp.fetchDays(session, from, today), workouts: await zepp.fetchWorkouts(session, days, user.tz) });
+    const relogin = async () => {
+      session = await zepp.login(row.email, openSecret(row.pass_enc), row.country);
+      db.prepare('UPDATE zepp_accounts SET app_token = ?, zepp_user = ? WHERE user_id = ?').run(session.appToken, session.userId, userId);
+    };
+    let data;
+    try {
+      if (!session) await relogin();
+      data = await pull();
+    } catch (e) {
+      if (e.kind !== 'auth') throw e;
+      await relogin(); // el token caducó: se entra de nuevo con la contraseña guardada
+      data = await pull();
+    }
+    const r = saveHealth(user, parseIngest(data), 'zepp');
+    db.prepare('UPDATE zepp_accounts SET last_sync = ?, last_error = NULL, synced_once = 1 WHERE user_id = ?').run(new Date().toISOString(), userId);
+    return { days: data.daily.length, workouts: r.workouts, completed: r.completed };
+  } catch (e) {
+    db.prepare('UPDATE zepp_accounts SET last_error = ? WHERE user_id = ?').run(String(e.message || 'Error').slice(0, 200), userId);
+    throw e;
+  } finally {
+    zeppBusy.delete(userId);
+  }
+}
+
+app.post('/api/zepp', auth, rateLimit, async (req, res) => {
+  const { email, password, country } = req.body || {};
+  if (typeof email !== 'string' || !/^\S+@\S+\.\S+$/.test(email.trim()) || email.length > 200) return res.status(400).json({ error: 'Escribe el correo de tu cuenta de Zepp' });
+  if (typeof password !== 'string' || !password || password.length > 200) return res.status(400).json({ error: 'Escribe la contraseña de tu cuenta de Zepp' });
+  const cc = typeof country === 'string' && /^[A-Za-z]{2}$/.test(country) ? country.toUpperCase() : 'US';
+  try {
+    const session = await zepp.login(email.trim(), password, cc); // comprueba que la cuenta vale antes de guardarla
+    db.prepare(`INSERT INTO zepp_accounts (user_id, email, pass_enc, country, app_token, zepp_user, created, synced_once) VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+      ON CONFLICT (user_id) DO UPDATE SET email = excluded.email, pass_enc = excluded.pass_enc, country = excluded.country, app_token = excluded.app_token, zepp_user = excluded.zepp_user, last_error = NULL, synced_once = 0`)
+      .run(req.user.id, email.trim(), sealSecret(password), cc, session.appToken, session.userId, new Date().toISOString());
+  } catch (e) {
+    return res.status(e.kind === 'login' ? 400 : 502).json({ error: e.message });
+  }
+  let result = null;
+  try { result = await zeppSync(req.user.id); } catch { /* el error queda guardado y se ve en el estado */ }
+  res.json({ ok: true, synced: result });
+});
+app.post('/api/zepp/sync', auth, rateLimit, async (req, res) => {
+  if (!db.prepare('SELECT 1 FROM zepp_accounts WHERE user_id = ?').get(req.user.id)) return res.status(404).json({ error: 'No hay ninguna cuenta de Zepp conectada' });
+  try { res.json({ ok: true, synced: await zeppSync(req.user.id) }); } catch (e) { res.status(502).json({ error: e.message }); }
+});
+app.delete('/api/zepp', auth, (req, res) => {
+  db.prepare('DELETE FROM zepp_accounts WHERE user_id = ?').run(req.user.id);
   res.json({ ok: true });
 });
 
@@ -1192,6 +1300,12 @@ async function reminderTick() {
   db.prepare('DELETE FROM sessions WHERE expires < ?').run(Date.now());
   db.prepare('DELETE FROM health_metrics WHERE date < ?').run(isoDate(Date.now() - 400 * 86400000));
 }
+const ZEPP_EVERY = Math.max(60000, Number(process.env.ZEPP_SYNC_MS) || 15 * 60000);
+setInterval(async () => {
+  for (const { user_id } of db.prepare('SELECT user_id FROM zepp_accounts').all()) {
+    try { await zeppSync(user_id); } catch (e) { console.error('zepp:', e.message); }
+  }
+}, ZEPP_EVERY);
 setInterval(() => reminderTick().catch((e) => console.error('recordatorios:', e)), 30000);
 
 app.listen(PORT, () => console.log(`Reset escuchando en http://localhost:${PORT}`));

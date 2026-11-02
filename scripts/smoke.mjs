@@ -4,11 +4,41 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import http from 'node:http';
+
+// Zepp de mentira: imita los tres pasos de inicio de sesión, el resumen diario y la lista de entrenamientos
+const zmock = { valid: 'TOK1', logins: 0, dayDate: new Date().toLocaleDateString('en-CA') };
+const zepp = http.createServer((req, res) => {
+  const url = new URL(req.url, 'http://x');
+  let body = '';
+  req.on('data', (c) => { body += c; });
+  req.on('end', () => {
+    const send = (code, obj, headers = {}) => { res.writeHead(code, { 'Content-Type': 'application/json', ...headers }); res.end(JSON.stringify(obj)); };
+    if (req.method === 'POST' && url.pathname.startsWith('/registrations/')) {
+      const p = new URLSearchParams(body);
+      if (p.get('password') !== 'zepp-pass') return send(200, {});
+      return send(302, {}, { Location: 'https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html?access=ACC1&region=eu' });
+    }
+    if (url.pathname === '/v2/client/login') return send(200, { token_info: { login_token: 'LT', user_id: '777' } });
+    if (url.pathname === '/v1/client/app_tokens') { zmock.logins++; zmock.valid = 'TOK' + zmock.logins; return send(200, { token_info: { app_token: zmock.valid } }); }
+    if (req.headers.apptoken !== zmock.valid) return send(401, {});
+    if (url.pathname === '/v1/data/band_data.json') {
+      const summary = Buffer.from(JSON.stringify({ stp: { ttl: 9100, dis: 7000 }, slp: { dp: 90, lt: 240, dt: 90, rhr: 55 } })).toString('base64');
+      return send(200, { data: [{ date_time: zmock.dayDate, summary }] });
+    }
+    if (url.pathname === '/v1/sport/run/history.json') {
+      return send(200, { data: { next: -1, summary: [{ trackid: String(Math.floor(Date.now() / 1000) - 60), type: 1, run_time: 2400, dis: 5200, calorie: 380, avg_heart_rate: 140, max_heart_rate: 170 }] } });
+    }
+    send(404, {});
+  });
+});
+await new Promise((resolve) => zepp.listen(0, resolve));
+const zbase = 'http://127.0.0.1:' + zepp.address().port;
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'reset-'));
 const port = 3100 + Math.floor(Math.random() * 500);
 const srv = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', 'server/server.js'], {
-  env: { ...process.env, PORT: String(port), DATA_DIR: dir, INVITE_CODE: 'abc123', RATE_LIMIT: '200' }, stdio: 'inherit',
+  env: { ...process.env, PORT: String(port), DATA_DIR: dir, INVITE_CODE: 'abc123', RATE_LIMIT: '200', ZEPP_USER_URL: zbase, ZEPP_API_URL: zbase }, stdio: 'inherit',
 });
 const base = `http://localhost:${port}`;
 const jar = {};
@@ -212,6 +242,46 @@ try {
   assert.equal((await call('a', 'DELETE', '/api/health/token', {})).status, 200);
   assert.equal((await ingest(hToken, payload)).status, 401, 'una clave revocada deja de valer');
 
+  // Zepp: lectura directa de la cuenta (con un Zepp de mentira)
+  assert.equal((await call('z', 'POST', '/api/register', { username: 'zoe', password: 'contraseña-larga', invite: 'abc123', tz: 'Europe/Madrid' })).status, 200);
+  await call('z', 'POST', '/api/onboarding', { date, domains: ['health'], wake: '07:30', level: 'empezando', values: [] });
+  const zWalk = (await call('z', 'POST', '/api/habits', { date, title: 'Caminar', icon: '🚶', domain: 'health', difficulty: 2, days: [0, 1, 2, 3, 4, 5, 6], auto: { metric: 'steps', min: 8000 } })).data;
+  const zWalkId = zWalk.habits.find((h) => h.title === 'Caminar').id;
+  assert.equal((await call('z', 'POST', '/api/zepp', { email: 'zoe@example.com', password: 'mala' })).status, 400, 'contraseña de Zepp incorrecta');
+  assert.equal((await call('z', 'POST', '/api/zepp', { email: 'no-es-un-correo', password: 'x' })).status, 400);
+  assert.equal((await call('z', 'GET', '/api/health/status')).data.zepp, null, 'una conexión fallida no guarda nada');
+  const conn = await call('z', 'POST', '/api/zepp', { email: 'zoe@example.com', password: 'zepp-pass', country: 'es' });
+  assert.equal(conn.status, 200);
+  assert.equal(conn.data.synced.workouts, 1);
+  const zst = (await call('z', 'GET', '/api/state?date=' + date)).data;
+  assert.equal(zst.health.steps, 9100);
+  assert.equal(zst.health.exercise, 40);
+  assert.equal(zst.health.distance, 7);
+  assert.equal(zst.health.sleep, 7);
+  assert.equal(zst.health.resting, 55);
+  assert.ok(zst.habits.find((h) => h.id === zWalkId).done, 'Zepp completa el hábito de pasos');
+  const zinfo = (await call('z', 'GET', '/api/health/status')).data.zepp;
+  assert.equal(zinfo.email, 'zoe@example.com');
+  assert.ok(zinfo.last_sync && !zinfo.last_error && !('pass_enc' in zinfo) && !('password' in zinfo), 'el estado no devuelve la contraseña');
+  const dbBytes = fs.readdirSync(dir).filter((n) => n.startsWith('app.db')).map((n) => fs.readFileSync(path.join(dir, n)).toString('latin1')).join('');
+  assert.ok(!dbBytes.includes('zepp-pass'), 'la contraseña de Zepp no está en claro en la base de datos');
+  assert.ok(fs.existsSync(path.join(dir, 'zepp.key')));
+  const xpZ = zst.xp;
+  assert.equal((await call('z', 'POST', '/api/zepp/sync', {})).status, 200);
+  const zst2 = (await call('z', 'GET', '/api/state?date=' + date)).data;
+  assert.equal(zst2.health.steps, 9100, 'sincronizar otra vez no duplica pasos');
+  assert.equal(zst2.health.workouts, 1, 'ni entrenamientos');
+  assert.equal(zst2.xp, xpZ, 'ni XP');
+  zmock.valid = 'caducado'; // el token caduca: debe entrar otra vez solo con la contraseña guardada
+  const re = await call('z', 'POST', '/api/zepp/sync', {});
+  assert.equal(re.status, 200, 'vuelve a iniciar sesión cuando caduca');
+  assert.ok(zmock.logins >= 2);
+  assert.equal((await call('b', 'GET', '/api/health/status')).data.zepp, null, 'cada persona tiene su cuenta de Zepp');
+  assert.equal((await call('z', 'DELETE', '/api/zepp', {})).status, 200);
+  assert.equal((await call('z', 'GET', '/api/health/status')).data.zepp, null);
+  assert.equal((await call('z', 'POST', '/api/zepp/sync', {})).status, 404);
+  assert.equal((await call('z', 'POST', '/api/account/delete', { password: 'contraseña-larga' })).status, 200);
+
   // cuenta: contraseña, exportación, invitaciones de un solo uso y borrado
   assert.equal((await call('a', 'POST', '/api/account/password', { current: 'mala', next: 'otra-contraseña-1' })).status, 403);
   assert.equal((await call('a', 'POST', '/api/account/password', { current: 'contraseña-larga', next: 'corta' })).status, 400);
@@ -244,6 +314,7 @@ try {
   console.error('FALLO:', e);
   process.exitCode = 1;
 } finally {
+  zepp.close();
   await new Promise((resolve) => { srv.once('exit', resolve); srv.kill(); });
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* Windows aún puede retener el archivo */ }
 }

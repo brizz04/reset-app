@@ -1,4 +1,4 @@
-const CACHE = 'reset-shell-v7';
+const CACHE = 'reset-shell-v8';
 const SHELL = ['/', '/styles.css', '/app.js', '/fx.js', '/offline.js', '/modal.js', '/i18n.js', '/locales/en.json', '/manifest.webmanifest', '/icons/icon-192.png', '/fonts/fonts.css', '/fonts/anton-400.woff2', '/fonts/chakra-petch-500.woff2', '/fonts/chakra-petch-700.woff2'];
 const NET_TIMEOUT = 4000; // si la red no responde en 4 s y hay copia guardada, se usa la copia (VPN caída, mala cobertura...)
 

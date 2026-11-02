@@ -25,7 +25,7 @@
 - Short lessons about how habits work (+XP) and **guided breathing** sessions.
 
 **Health data (phone and watch)**
-- Reads steps, exercise minutes, distance, workouts, heart rate, sleep and more from Apple Health / Health Connect through a bridge app (Zepp and Samsung watches work through them).
+- **Reads your Zepp account directly** (steps, distance, sleep, resting heart rate, workouts), or reads Apple Health / Health Connect through a bridge app (Samsung watches work that way).
 - Habits with an **automatic rule** ("walk 8,000 steps", "sleep 7 h") complete themselves when you reach the goal.
 
 **Self-hosted and private**
@@ -123,9 +123,29 @@ to be enabled again on every device).
   `content/templates.json`.
 - Your own editable content: `content/lessons.json`, `content/cards.json` and `content/templates.json`.
 
-## Health data (phone and Zepp or Samsung watch)
+## Health data
 
-A browser cannot read Apple Health or Health Connect, and Zepp has no public API. The way in is this:
+There are two ways in. Pick one source per person so the same steps are not counted twice.
+
+### Option 1: read your Zepp account directly
+
+**Profile → Health and exercise → Connect Zepp.** Enter the email and password of your Zepp account (the one in your
+watch's app). The server signs in and, every 15 minutes, reads your steps, distance, sleep, resting heart rate and
+workouts, and completes habits that have an automatic rule. It only reads, and it does not sign out your phone's Zepp
+app. It works with any watch that syncs to Zepp (Amazfit, Zepp OS...).
+
+- **Unofficial.** Zepp has no public API. This uses the same undocumented interface as its web login, so it may stop
+  working whenever Zepp changes it, and it may go against Zepp's terms of use. Use it only with your own account.
+- **Your password is stored on your server**, encrypted with AES-256-GCM using a key in `DATA_DIR/zepp.key`. Anyone who
+  can read the whole data folder can decrypt it. Disconnect Zepp in the same panel to delete it.
+- Accounts created with Google or Apple sign-in may not work: set a password in the Zepp app first.
+- Only the code in `server/zepp.js` talks to Zepp. `npm test` checks it against a fake Zepp server, **not** the real
+  one, so the first real connection is the real test; if something fails, the panel shows the error. For testing,
+  `ZEPP_USER_URL` and `ZEPP_API_URL` point to another server, and `ZEPP_SYNC_MS` changes the interval.
+
+### Option 2: through Apple Health or Health Connect
+
+A browser cannot read Apple Health or Health Connect. The way in is this:
 
 1. In your watch's app: **Zepp** (Profile → Add accounts → Apple Health or Health Connect) or **Samsung Health**
    (Settings → Health Connect, on Android), with all data enabled. If you use several watches, keep a single source per

@@ -557,7 +557,37 @@
     "horas": "hours",
     "minutos": "minutes",
     "entrenamientos": "workouts",
-    "Estás en inglés": "You are using English"
+    "Estás en inglés": "You are using English",
+    "Conectar Zepp": "Connect Zepp",
+    "Zepp conectado": "Zepp connected",
+    "Zepp": "Zepp",
+    "Otras apps": "Other apps",
+    "Correo de Zepp": "Zepp email",
+    "Contraseña de Zepp": "Zepp password",
+    "País (2 letras, como en tu cuenta)": "Country (2 letters, as in your account)",
+    "Conectar": "Connect",
+    "Sincronizar ahora": "Sync now",
+    "Zepp sincronizado": "Zepp synced",
+    "Desconectar Zepp": "Disconnect Zepp",
+    "Reset entra en tu cuenta de Zepp (la de la app del reloj) y lee cada 15 minutos tus pasos, distancia, sueño, pulso en reposo y entrenamientos. Solo lee: no cambia nada en tu cuenta ni cierra la sesión de tu móvil.": "Reset signs in to your Zepp account (the one in your watch app) and reads your steps, distance, sleep, resting heart rate and workouts every 15 minutes. It only reads: it changes nothing in your account and does not sign out your phone.",
+    "Zepp no ofrece una conexión oficial, así que esto usa su interfaz web sin documentar: puede dejar de funcionar si Zepp la cambia. La contraseña se guarda cifrada en tu servidor. Si entras en Zepp con Google o Apple, puede que no funcione: crea antes una contraseña en la app de Zepp.": "Zepp has no official connection, so this uses its undocumented web interface: it may stop working if Zepp changes it. The password is stored encrypted on your server. If you sign in to Zepp with Google or Apple it may not work: first create a password in the Zepp app.",
+    "Reset lee tu cuenta de Zepp cada 15 minutos: pasos, distancia, sueño, pulso en reposo y entrenamientos.": "Reset reads your Zepp account every 15 minutes: steps, distance, sleep, resting heart rate and workouts.",
+    "Última lectura: ": "Last reading: ",
+    "Zepp conectado · última lectura: ": "Zepp connected · last reading: ",
+    "todavía ninguna": "none yet",
+    "¿Desconectar Zepp? Se borra la contraseña guardada y dejan de leerse datos nuevos.": "Disconnect Zepp? The saved password is deleted and no new data is read.",
+    "Escribe el correo de tu cuenta de Zepp": "Enter your Zepp account email",
+    "Escribe la contraseña de tu cuenta de Zepp": "Enter your Zepp account password",
+    "Zepp no ha aceptado ese correo y contraseña": "Zepp did not accept that email and password",
+    "Zepp no ha devuelto una sesión válida": "Zepp did not return a valid session",
+    "Zepp no ha devuelto un token de acceso": "Zepp did not return an access token",
+    "No se pudo conectar con Zepp": "Could not connect to Zepp",
+    "La sesión de Zepp ha caducado": "The Zepp session has expired",
+    "Zepp envió una respuesta que no se entiende": "Zepp sent a response that cannot be understood",
+    "No hay ninguna cuenta de Zepp conectada": "No Zepp account is connected",
+    "Cinta de correr": "Treadmill",
+    "Elíptica": "Elliptical",
+    "Senderismo": "Hiking"
   },
   "patterns": [
     ["^(.+) · (\\d+) min$","$t1 · $2 min"],
@@ -628,6 +658,7 @@
     ["^Sincronizando (\\d+) cambios?…$","Syncing $1 change(s)…"],
     ["^Temporada de (.+)$","Season of $1"],
     ["^(\\d+) / (\\d+) XP$","$1 / $2 XP"],
-    ["^¡Nivel (\\d+)! Ganas un pack de cartas$","Level $1! You win a card pack"]
+    ["^¡Nivel (\\d+)! Ganas un pack de cartas$","Level $1! You win a card pack"],
+    ["^Zepp respondió con el error (\\d+)$","Zepp responded with error $1"]
   ]
 }

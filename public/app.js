@@ -794,15 +794,17 @@ function healthPanel() {
     const max = Math.max(1, ...vals.filter((v) => v != null));
     const unit = CHARTS.find((c) => c[0] === chart)[2];
     box.replaceChildren(
-      h('p', { class: 'muted small' }, st.token
-        ? tr('Conectado · último envío: ') + (st.token.last_used ? new Date(st.token.last_used).toLocaleString(localeTag()) : tr('todavía ninguno'))
-        : 'Aún no hay ningún móvil o reloj conectado. Puedes añadir entrenamientos a mano o conectar Zepp.'),
+      st.zepp ? h('p', { class: 'muted small' }, tr('Zepp conectado · última lectura: ') + (st.zepp.last_sync ? new Date(st.zepp.last_sync).toLocaleString(localeTag()) : tr('todavía ninguna')),
+        st.zepp.last_error ? h('span', { class: 'err' }, ' · ' + st.zepp.last_error) : null) : null,
+      st.token ? h('p', { class: 'muted small' }, tr('Conectado · último envío: ') + (st.token.last_used ? new Date(st.token.last_used).toLocaleString(localeTag()) : tr('todavía ninguno'))) : null,
+      !st.zepp && !st.token ? h('p', { class: 'muted small' }, 'Aún no hay ningún móvil o reloj conectado. Puedes añadir entrenamientos a mano o conectar Zepp.') : null,
       h('div', { class: 'seg' }, CHARTS.map(([k, t]) => h('button', { class: chart === k ? 'on' : '', onclick: () => { chart = k; draw(d, st); } }, t))),
       h('div', { class: 'insbars' }, d.week.map((x) => h('div', null, x[chart] ? String(x[chart]) : '–',
         h('i', { style: 'height:' + Math.round(((x[chart] || 0) / max) * 100) + '%' }), dayLetters()[new Date(x.date + 'T12:00:00').getDay()]))),
       h('div', { class: 'muted small' }, 'Últimos 7 días (' + unit + ')'),
       h('div', { class: 'row' },
-        h('button', { class: 'btn small grow', onclick: () => healthConnectSheet(() => load()) }, st.token ? 'Ver conexión' : 'Conectar móvil o reloj'),
+        h('button', { class: 'btn small grow', onclick: () => zeppSheet(() => load()) }, st.zepp ? 'Zepp' : 'Conectar Zepp'),
+        h('button', { class: 'btn ghost small grow', onclick: () => healthConnectSheet(() => load()) }, st.token ? 'Ver conexión' : 'Otras apps'),
         h('button', { class: 'btn ghost small grow', onclick: workoutSheet }, 'Añadir entrenamiento')),
       d.workouts.length ? [h('div', { class: 'muted small' }, 'Entrenamientos recientes'),
         d.workouts.slice(0, 6).map((w) => h('div', { class: 'row' },
@@ -866,6 +868,52 @@ function healthConnectSheet(done) {
       status?.token && !token ? h('button', { class: 'btn danger block', onclick: run(async () => { if (!confirm(tr('¿Revocar la clave? La app puente dejará de funcionar hasta que pongas una nueva.'))) return; await api('/api/health/token', 'DELETE', {}); if (done) done(); close(); }) }, 'Revocar clave') : null,
       h('button', { class: 'btn ghost block', onclick: close }, 'Cerrar'));
     api('/api/health/status').then((st) => draw(null, st)).catch(() => draw(null, null));
+    return root;
+  });
+}
+
+// Lectura directa de la cuenta de Zepp (interfaz no oficial; ver server/zepp.js)
+function zeppSheet(done) {
+  sheet((close) => {
+    const root = h('div', { class: 'gap' });
+    const err = h('div', { class: 'err', role: 'alert' });
+    const region = (() => { try { return new Intl.Locale(navigator.language).region || ''; } catch { return ''; } })();
+    const f = { email: '', password: '', country: region || (lang === 'es' ? 'ES' : 'US') };
+    const connect = async () => {
+      err.textContent = '';
+      try {
+        await api('/api/zepp', 'POST', f);
+        toast('Zepp conectado');
+        if (done) done();
+        close();
+      } catch (e) { err.textContent = tr(e.offline ? 'Sin conexión: esto necesita internet' : e.message); }
+    };
+    const draw = (z) => {
+      if (z) {
+        root.replaceChildren(h('h2', null, 'Zepp conectado'),
+          h('div', { class: 'card gap' }, h('b', null, z.email),
+            h('p', { class: 'small muted' }, tr('Última lectura: ') + (z.last_sync ? new Date(z.last_sync).toLocaleString(localeTag()) : tr('todavía ninguna'))),
+            z.last_error ? h('p', { class: 'small err' }, tr(z.last_error)) : null,
+            h('p', { class: 'small muted' }, 'Reset lee tu cuenta de Zepp cada 15 minutos: pasos, distancia, sueño, pulso en reposo y entrenamientos.')),
+          err,
+          h('button', { class: 'btn block', onclick: async () => { err.textContent = ''; try { await api('/api/zepp/sync', 'POST', {}); toast('Zepp sincronizado'); if (done) done(); close(); } catch (e) { err.textContent = tr(e.offline ? 'Sin conexión: esto necesita internet' : e.message); } } }, 'Sincronizar ahora'),
+          h('button', { class: 'btn danger block', onclick: run(async () => { if (!confirm(tr('¿Desconectar Zepp? Se borra la contraseña guardada y dejan de leerse datos nuevos.'))) return; await api('/api/zepp', 'DELETE', {}); if (done) done(); close(); }) }, 'Desconectar Zepp'),
+          h('button', { class: 'btn ghost block', onclick: close }, 'Cerrar'));
+        return;
+      }
+      root.replaceChildren(h('h2', null, 'Conectar Zepp'),
+        h('p', { class: 'muted small' }, 'Reset entra en tu cuenta de Zepp (la de la app del reloj) y lee cada 15 minutos tus pasos, distancia, sueño, pulso en reposo y entrenamientos. Solo lee: no cambia nada en tu cuenta ni cierra la sesión de tu móvil.'),
+        h('div', { class: 'card gap' },
+          h('label', { class: 'f' }, 'Correo de Zepp', h('input', { type: 'email', autocomplete: 'off', oninput: (e) => { f.email = e.target.value; } })),
+          h('label', { class: 'f' }, 'Contraseña de Zepp', h('input', { type: 'password', autocomplete: 'off', oninput: (e) => { f.password = e.target.value; } })),
+          h('label', { class: 'f' }, 'País (2 letras, como en tu cuenta)', h('input', { type: 'text', maxlength: 2, value: f.country, oninput: (e) => { f.country = e.target.value; } }))),
+        h('p', { class: 'small muted' }, 'Zepp no ofrece una conexión oficial, así que esto usa su interfaz web sin documentar: puede dejar de funcionar si Zepp la cambia. La contraseña se guarda cifrada en tu servidor. Si entras en Zepp con Google o Apple, puede que no funcione: crea antes una contraseña en la app de Zepp.'),
+        err,
+        h('button', { class: 'btn block', onclick: connect }, 'Conectar'),
+        h('button', { class: 'btn ghost block', onclick: close }, 'Cancelar'));
+    };
+    draw(null);
+    api('/api/health/status').then((st) => { if (st.zepp) draw(st.zepp); }).catch(() => {});
     return root;
   });
 }
