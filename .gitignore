@@ -1,0 +1,8 @@
+node_modules
+data
+.env
+.agents
+.claude
+skills-lock.json
+assets-src
+scripts/.strings.json

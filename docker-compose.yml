@@ -1,0 +1,19 @@
+services:
+  reset:
+    build: .
+    restart: unless-stopped
+    ports:
+      # Solo en este equipo: Tailscale (tailscale serve --bg 3000) o tu proxy lo publican con HTTPS.
+      # Para entrar desde la red local sin proxy, BIND=0.0.0.0 en .env
+      - "${BIND:-127.0.0.1}:${PORT:-3000}:3000"
+    environment:
+      # Pon COOKIE_SECURE=1 en .env cuando lo sirvas por HTTPS (Tailscale, Caddy, Traefik, Cloudflare Tunnel...)
+      COOKIE_SECURE: "${COOKIE_SECURE:-0}"
+      # Código para que otras personas se registren. Vacío = registro cerrado tras el primer usuario.
+      INVITE_CODE: "${INVITE_CODE:-}"
+      VAPID_SUBJECT: "${VAPID_SUBJECT:-mailto:admin@example.com}"
+    volumes:
+      - reset-data:/data
+
+volumes:
+  reset-data:

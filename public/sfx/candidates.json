@@ -1,0 +1,348 @@
+{
+  "tap": {
+    "active": "1-tick_004",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/tap.mp3"
+      },
+      {
+        "id": "1-tick_004",
+        "label": "tick_004 · Kenney Interface",
+        "file": "/sfx/candidates/tap/1-tick_004.mp3",
+        "seconds": 0.06
+      },
+      {
+        "id": "2-click_001",
+        "label": "click_001 · Kenney Interface",
+        "file": "/sfx/candidates/tap/2-click_001.mp3",
+        "seconds": 0.11
+      },
+      {
+        "id": "3-select_001",
+        "label": "select_001 · Kenney Interface",
+        "file": "/sfx/candidates/tap/3-select_001.mp3",
+        "seconds": 0.06
+      }
+    ]
+  },
+  "done": {
+    "active": "1-confirmation_002",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/done.mp3"
+      },
+      {
+        "id": "1-confirmation_002",
+        "label": "confirmation_002 · Kenney Interface",
+        "file": "/sfx/candidates/done/1-confirmation_002.mp3",
+        "seconds": 0.56
+      },
+      {
+        "id": "2-confirmation_004",
+        "label": "confirmation_004 · Kenney Interface",
+        "file": "/sfx/candidates/done/2-confirmation_004.mp3",
+        "seconds": 0.5
+      },
+      {
+        "id": "3-pluck_002",
+        "label": "pluck_002 · Kenney Interface",
+        "file": "/sfx/candidates/done/3-pluck_002.mp3",
+        "seconds": 0.18
+      }
+    ]
+  },
+  "all-done": {
+    "active": "1-Coin01",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/all-done.mp3"
+      },
+      {
+        "id": "1-Coin01",
+        "label": "Coin01 · OpenGameArt",
+        "file": "/sfx/candidates/all-done/1-Coin01.mp3",
+        "seconds": 2.55
+      },
+      {
+        "id": "2-Upper01",
+        "label": "Upper01 · OpenGameArt",
+        "file": "/sfx/candidates/all-done/2-Upper01.mp3",
+        "seconds": 2.8
+      },
+      {
+        "id": "3-Rise06",
+        "label": "Rise06 · OpenGameArt",
+        "file": "/sfx/candidates/all-done/3-Rise06.mp3",
+        "seconds": 2.58
+      }
+    ]
+  },
+  "level-up": {
+    "active": "1-Rise04",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/level-up.mp3"
+      },
+      {
+        "id": "1-Rise04",
+        "label": "Rise04 · OpenGameArt",
+        "file": "/sfx/candidates/level-up/1-Rise04.mp3",
+        "seconds": 3.35
+      },
+      {
+        "id": "2-Rise06",
+        "label": "Rise06 · OpenGameArt",
+        "file": "/sfx/candidates/level-up/2-Rise06.mp3",
+        "seconds": 2.58
+      },
+      {
+        "id": "3-FX02",
+        "label": "FX02 · OpenGameArt",
+        "file": "/sfx/candidates/level-up/3-FX02.mp3",
+        "seconds": 4.5
+      }
+    ]
+  },
+  "pack-charge": {
+    "active": "mine",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/pack-charge.mp3"
+      },
+      {
+        "id": "1-Rise02",
+        "label": "Rise02 · OpenGameArt",
+        "file": "/sfx/candidates/pack-charge/1-Rise02.mp3",
+        "seconds": 1.09
+      },
+      {
+        "id": "2-Rise03",
+        "label": "Rise03 · OpenGameArt",
+        "file": "/sfx/candidates/pack-charge/2-Rise03.mp3",
+        "seconds": 1.09
+      },
+      {
+        "id": "3-force_field_002",
+        "label": "force_field_002 · Kenney Sci-Fi",
+        "file": "/sfx/candidates/pack-charge/3-force_field_002.mp3",
+        "seconds": 0.96
+      }
+    ]
+  },
+  "pack-tear": {
+    "active": "1-scratch_004",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/pack-tear.mp3"
+      },
+      {
+        "id": "1-scratch_004",
+        "label": "scratch_004 · Kenney Interface",
+        "file": "/sfx/candidates/pack-tear/1-scratch_004.mp3",
+        "seconds": 0.35
+      },
+      {
+        "id": "2-scratch_005",
+        "label": "scratch_005 · Kenney Interface",
+        "file": "/sfx/candidates/pack-tear/2-scratch_005.mp3",
+        "seconds": 0.34
+      },
+      {
+        "id": "3-laser_large_002",
+        "label": "laser_large_002 · Kenney Sci-Fi",
+        "file": "/sfx/candidates/pack-tear/3-laser_large_002.mp3",
+        "seconds": 0.7
+      }
+    ]
+  },
+  "pack-slam": {
+    "active": "1-low_frequency_explosion_001",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/pack-slam.mp3"
+      },
+      {
+        "id": "1-low_frequency_explosion_001",
+        "label": "low_frequency_explosion_001 · Kenney Sci-Fi",
+        "file": "/sfx/candidates/pack-slam/1-low_frequency_explosion_001.mp3",
+        "seconds": 1.0
+      },
+      {
+        "id": "2-impact_punch_heavy_002",
+        "label": "impact_punch_heavy_002 · Kenney Impact",
+        "file": "/sfx/candidates/pack-slam/2-impact_punch_heavy_002.mp3",
+        "seconds": 0.46
+      },
+      {
+        "id": "3-impact_metal_001",
+        "label": "impact_metal_001 · Kenney Sci-Fi",
+        "file": "/sfx/candidates/pack-slam/3-impact_metal_001.mp3",
+        "seconds": 0.69
+      }
+    ]
+  },
+  "reveal-common": {
+    "active": "1-pluck_002",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/reveal-common.mp3"
+      },
+      {
+        "id": "1-pluck_002",
+        "label": "pluck_002 · Kenney Interface",
+        "file": "/sfx/candidates/reveal-common/1-pluck_002.mp3",
+        "seconds": 0.18
+      },
+      {
+        "id": "2-glass_001",
+        "label": "glass_001 · Kenney Interface",
+        "file": "/sfx/candidates/reveal-common/2-glass_001.mp3",
+        "seconds": 0.29
+      },
+      {
+        "id": "3-impact_glass_light_001",
+        "label": "impact_glass_light_001 · Kenney Impact",
+        "file": "/sfx/candidates/reveal-common/3-impact_glass_light_001.mp3",
+        "seconds": 0.21
+      }
+    ]
+  },
+  "reveal-rare": {
+    "active": "1-glass_004",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/reveal-rare.mp3"
+      },
+      {
+        "id": "1-glass_004",
+        "label": "glass_004 · Kenney Interface",
+        "file": "/sfx/candidates/reveal-rare/1-glass_004.mp3",
+        "seconds": 0.71
+      },
+      {
+        "id": "2-confirmation_003",
+        "label": "confirmation_003 · Kenney Interface",
+        "file": "/sfx/candidates/reveal-rare/2-confirmation_003.mp3",
+        "seconds": 0.32
+      },
+      {
+        "id": "3-impact_bell_heavy_003",
+        "label": "impact_bell_heavy_003 · Kenney Impact",
+        "file": "/sfx/candidates/reveal-rare/3-impact_bell_heavy_003.mp3",
+        "seconds": 0.65
+      }
+    ]
+  },
+  "reveal-epic": {
+    "active": "1-FX01",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/reveal-epic.mp3"
+      },
+      {
+        "id": "1-FX01",
+        "label": "FX01 · OpenGameArt",
+        "file": "/sfx/candidates/reveal-epic/1-FX01.mp3",
+        "seconds": 2.38
+      },
+      {
+        "id": "2-impact_bell_heavy_001",
+        "label": "impact_bell_heavy_001 · Kenney Impact",
+        "file": "/sfx/candidates/reveal-epic/2-impact_bell_heavy_001.mp3",
+        "seconds": 1.74
+      },
+      {
+        "id": "3-select_006",
+        "label": "select_006 · Kenney Interface",
+        "file": "/sfx/candidates/reveal-epic/3-select_006.mp3",
+        "seconds": 1.92
+      }
+    ]
+  },
+  "reveal-legendary": {
+    "active": "1-FX02",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/reveal-legendary.mp3"
+      },
+      {
+        "id": "1-FX02",
+        "label": "FX02 · OpenGameArt",
+        "file": "/sfx/candidates/reveal-legendary/1-FX02.mp3",
+        "seconds": 3.8
+      },
+      {
+        "id": "2-Upper01",
+        "label": "Upper01 · OpenGameArt",
+        "file": "/sfx/candidates/reveal-legendary/2-Upper01.mp3",
+        "seconds": 3.38
+      },
+      {
+        "id": "3-impact_bell_heavy_000",
+        "label": "impact_bell_heavy_000 · Kenney Impact",
+        "file": "/sfx/candidates/reveal-legendary/3-impact_bell_heavy_000.mp3",
+        "seconds": 1.48
+      }
+    ]
+  },
+  "notification": {
+    "active": "1-confirmation_003",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado)",
+        "file": "/sfx/mine/notification.mp3"
+      },
+      {
+        "id": "1-confirmation_003",
+        "label": "confirmation_003 · Kenney Interface",
+        "file": "/sfx/candidates/notification/1-confirmation_003.mp3",
+        "seconds": 0.32
+      },
+      {
+        "id": "2-confirmation_001",
+        "label": "confirmation_001 · Kenney Interface",
+        "file": "/sfx/candidates/notification/2-confirmation_001.mp3",
+        "seconds": 0.29
+      },
+      {
+        "id": "3-bong_001",
+        "label": "bong_001 · Kenney Interface",
+        "file": "/sfx/candidates/notification/3-bong_001.mp3",
+        "seconds": 0.13
+      }
+    ]
+  },
+  "ambient-breathing": {
+    "active": "mine",
+    "options": [
+      {
+        "id": "mine",
+        "label": "Mío (sintetizado, bucle de 60 s)",
+        "file": "/sfx/mine/ambient-breathing.mp3"
+      }
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+[
+  {
+    "id": "bucle",
+    "title": "El bucle del hábito",
+    "subtitle": "Señal → Rutina → Recompensa",
+    "icon": "cycle",
+    "minutes": 3,
+    "body": [
+      "Casi todo lo que haces en automático sigue el mismo patrón: algo te avisa (la señal), haces algo (la rutina) y obtienes algo que te gusta (la recompensa). El cerebro repite lo que le sale a cuenta.",
+      "Para crear un hábito nuevo, no empieces por la fuerza de voluntad: empieza por elegir una señal clara. «Cuando termine de desayunar» funciona mejor que «por la mañana».",
+      "Para quitar un hábito malo, localiza su señal y su recompensa. Si sabes qué buscas realmente (descanso, compañía, distracción), puedes darte lo mismo de otra forma."
+    ],
+    "takeaway": "Un hábito es una señal que dispara una rutina que se premia. Cambia el diseño, no solo la intención.",
+    "action": "Escribe la señal exacta de tu hábito principal: dónde estás, a qué hora, qué acaba de pasar."
+  },
+  {
+    "id": "pequeno",
+    "title": "Empieza ridículamente pequeño",
+    "subtitle": "Dos minutos bastan",
+    "icon": "acorn",
+    "minutes": 3,
+    "body": [
+      "La mayoría abandona porque empieza con un objetivo demasiado grande para un día malo. Una versión diminuta del hábito sobrevive hasta cuando estás cansado.",
+      "«Leer 30 minutos» pasa a ser «leer una página». «Hacer ejercicio» pasa a ser «ponerme las zapatillas». Lo importante al principio es aparecer, no rendir.",
+      "Cuando la acción mínima ya es automática, crecer es fácil: a menudo seguirás una vez que has empezado."
+    ],
+    "takeaway": "Primero se construye el hábito de aparecer; la intensidad llega sola después.",
+    "action": "Reduce tu hábito principal a una versión que puedas hacer en menos de dos minutos."
+  },
+  {
+    "id": "apilar",
+    "title": "Apila sobre lo que ya haces",
+    "subtitle": "Engancha lo nuevo a lo viejo",
+    "icon": "brick-wall",
+    "minutes": 3,
+    "body": [
+      "Ya tienes rutinas sólidas: despertarte, lavarte los dientes, hacer café, sentarte a trabajar. Son anclas gratuitas.",
+      "La fórmula es simple: «Después de [rutina actual], haré [hábito nuevo]». La rutina vieja hace de recordatorio y no dependes de acordarte.",
+      "Elige un ancla que ocurra todos los días y que sea del mismo tamaño que el hábito. Un ancla que a veces no pasa deja huecos."
+    ],
+    "takeaway": "Una buena ancla vale más que cualquier alarma.",
+    "action": "Completa la frase: «Después de ______, haré ______»."
+  },
+  {
+    "id": "entorno",
+    "title": "Diseña tu entorno",
+    "subtitle": "Lo fácil se repite",
+    "icon": "house",
+    "minutes": 3,
+    "body": [
+      "Tu entorno decide más de lo que crees. Si la guitarra está en el armario, tocarás menos que si está a la vista.",
+      "Para hábitos que quieres, quita pasos: deja la ropa de deporte preparada, la fruta a mano, el libro en la almohada.",
+      "Para hábitos que quieres evitar, añade pasos: borra la app del móvil, guarda el mando en otra habitación, cierra sesión."
+    ],
+    "takeaway": "Haz que lo bueno sea obvio y fácil, y lo malo invisible y difícil.",
+    "action": "Cambia una cosa de tu casa o tu móvil hoy para que tu hábito te cueste un paso menos."
+  },
+  {
+    "id": "identidad",
+    "title": "Identidad antes que objetivos",
+    "subtitle": "Vota por la persona que quieres ser",
+    "icon": "id-card",
+    "minutes": 3,
+    "body": [
+      "«Quiero correr una maratón» es un objetivo. «Soy una persona que se mueve cada día» es una identidad. Los objetivos se acaban; las identidades se mantienen.",
+      "Cada vez que completas un hábito emites un voto a favor de esa identidad. No necesitas unanimidad, solo mayoría de votos.",
+      "Por eso importa más no fallar los días malos con una versión mínima que brillar los días buenos."
+    ],
+    "takeaway": "Cada repetición es una prueba de quién eres.",
+    "action": "Termina la frase: «Soy una persona que ______» y haz hoy una acción que lo demuestre."
+  },
+  {
+    "id": "recaida",
+    "title": "Cuando fallas",
+    "subtitle": "Nunca dos veces seguidas",
+    "icon": "bandage-roll",
+    "minutes": 3,
+    "body": [
+      "Fallar un día no rompe nada. Lo que rompe un hábito es el «ya lo he estropeado todo» que viene después.",
+      "La regla es sencilla: puedes saltarte un día, pero no dos seguidos. El segundo día fallado es donde un descuido se convierte en abandono.",
+      "Si no puedes hacerlo entero, haz la versión mínima. Una racha que sobrevive con el mínimo vale más que una perfecta que se rompe."
+    ],
+    "takeaway": "La constancia no es perfección: es volver rápido.",
+    "action": "Decide ahora cuál es tu versión mínima para los días malos."
+  },
+  {
+    "id": "sesentaiseis",
+    "title": "¿Por qué 66 días?",
+    "subtitle": "Lo que dice la investigación",
+    "icon": "calendar",
+    "minutes": 3,
+    "body": [
+      "Un estudio de la University College London siguió a personas que adoptaban un hábito nuevo y encontró que, de media, tardaban unos 66 días en que se volviera automático.",
+      "Pero la media esconde mucho rango: según la persona y el hábito, fue desde unas 18 semanas hasta bastante menos. Hábitos simples tardan menos que los complicados.",
+      "Y fallar un día suelto no estropeó el proceso. No es un plazo mágico: es una referencia para tener paciencia."
+    ],
+    "takeaway": "Dale tiempo: la automatización llega por repetición, no de golpe.",
+    "action": "Apunta la fecha de hoy como día 1 y revisa tu progreso dentro de dos semanas."
+  }
+]

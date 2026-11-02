@@ -1,0 +1,196 @@
+{
+  "health": {
+    "name": "Salud",
+    "icon": "biceps",
+    "color": "#2ee6c4",
+    "habits": [
+      {
+        "title": "Beber un vaso de agua al despertar",
+        "icon": "💧",
+        "difficulty": 1,
+        "morning": true
+      },
+      {
+        "title": "Caminar 20 minutos",
+        "icon": "🚶",
+        "difficulty": 1
+      },
+      {
+        "title": "Entrenar (fuerza o cardio)",
+        "icon": "🏋️",
+        "difficulty": 3
+      },
+      {
+        "title": "Dormir antes de las 23:00",
+        "icon": "😴",
+        "difficulty": 2
+      }
+    ]
+  },
+  "mind": {
+    "name": "Mente",
+    "icon": "brain",
+    "color": "#9b87ff",
+    "habits": [
+      {
+        "title": "Respirar 5 minutos",
+        "icon": "🧘",
+        "difficulty": 1,
+        "morning": true
+      },
+      {
+        "title": "Escribir 3 líneas en un diario",
+        "icon": "📓",
+        "difficulty": 1
+      },
+      {
+        "title": "Una hora sin pantallas antes de dormir",
+        "icon": "📵",
+        "difficulty": 2
+      },
+      {
+        "title": "Dar gracias por algo",
+        "icon": "🙏",
+        "difficulty": 1
+      }
+    ]
+  },
+  "career": {
+    "name": "Carrera",
+    "icon": "briefcase",
+    "color": "#1b8cff",
+    "habits": [
+      {
+        "title": "Planificar las 3 tareas clave del día",
+        "icon": "🎯",
+        "difficulty": 1,
+        "morning": true
+      },
+      {
+        "title": "90 minutos de trabajo profundo",
+        "icon": "⏱️",
+        "difficulty": 3
+      },
+      {
+        "title": "Aprender una habilidad útil 20 min",
+        "icon": "🛠️",
+        "difficulty": 2
+      },
+      {
+        "title": "Revisar objetivos de la semana",
+        "icon": "🗂️",
+        "difficulty": 1
+      }
+    ]
+  },
+  "discipline": {
+    "name": "Disciplina",
+    "icon": "katana",
+    "color": "#7fd0ff",
+    "habits": [
+      {
+        "title": "Hacer la cama",
+        "icon": "🛏️",
+        "difficulty": 1,
+        "morning": true
+      },
+      {
+        "title": "Ducha fría de 30 segundos",
+        "icon": "🚿",
+        "difficulty": 2
+      },
+      {
+        "title": "Hacer lo más difícil primero",
+        "icon": "🔨",
+        "difficulty": 3
+      },
+      {
+        "title": "Recoger y ordenar 10 minutos",
+        "icon": "🧹",
+        "difficulty": 1
+      }
+    ]
+  },
+  "relationships": {
+    "name": "Relaciones",
+    "icon": "shaking-hands",
+    "color": "#ff7ab6",
+    "habits": [
+      {
+        "title": "Escribir a alguien que quiero",
+        "icon": "💬",
+        "difficulty": 1
+      },
+      {
+        "title": "Una conversación sin móvil",
+        "icon": "☕",
+        "difficulty": 2
+      },
+      {
+        "title": "Hacer un cumplido sincero",
+        "icon": "🌟",
+        "difficulty": 1
+      },
+      {
+        "title": "Llamar a familia o amigos",
+        "icon": "📞",
+        "difficulty": 2
+      }
+    ]
+  },
+  "learning": {
+    "name": "Aprendizaje",
+    "icon": "book-pile",
+    "color": "#ffc447",
+    "habits": [
+      {
+        "title": "Leer 10 páginas",
+        "icon": "📖",
+        "difficulty": 1
+      },
+      {
+        "title": "Estudiar 30 minutos",
+        "icon": "✏️",
+        "difficulty": 2
+      },
+      {
+        "title": "Practicar un idioma 15 min",
+        "icon": "🌍",
+        "difficulty": 2
+      },
+      {
+        "title": "Anotar una idea que he aprendido",
+        "icon": "💡",
+        "difficulty": 1
+      }
+    ]
+  },
+  "spirit": {
+    "name": "Espíritu",
+    "icon": "yin-yang",
+    "color": "#4fe0a0",
+    "habits": [
+      {
+        "title": "Pasar 10 minutos al aire libre",
+        "icon": "🌳",
+        "difficulty": 1,
+        "morning": true
+      },
+      {
+        "title": "Meditar en silencio",
+        "icon": "🕯️",
+        "difficulty": 2
+      },
+      {
+        "title": "Revisar mis valores y mi día",
+        "icon": "🧭",
+        "difficulty": 1
+      },
+      {
+        "title": "Ayudar a alguien sin esperar nada",
+        "icon": "🎁",
+        "difficulty": 2
+      }
+    ]
+  }
+}

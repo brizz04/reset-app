@@ -1,0 +1,9 @@
+node_modules
+data
+.git
+scripts
+README*.md
+assets-src
+.agents
+.claude
+.env
